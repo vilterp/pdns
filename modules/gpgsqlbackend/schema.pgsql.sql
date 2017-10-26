@@ -1,5 +1,6 @@
+CREATE SEQUENCE domains_id_seq;
 CREATE TABLE domains (
-  id                    SERIAL PRIMARY KEY,
+  id                    SMALLINT PRIMARY KEY DEFAULT nextval('domains_id_seq'),
   name                  VARCHAR(255) NOT NULL,
   master                VARCHAR(128) DEFAULT NULL,
   last_check            INT DEFAULT NULL,
@@ -10,7 +11,6 @@ CREATE TABLE domains (
 );
 
 CREATE UNIQUE INDEX name_index ON domains(name);
-
 
 CREATE TABLE records (
   id                    BIGSERIAL PRIMARY KEY,
@@ -24,16 +24,14 @@ CREATE TABLE records (
   disabled              BOOL DEFAULT 'f',
   ordername             VARCHAR(255),
   auth                  BOOL DEFAULT 't',
-  CONSTRAINT domain_exists
-  FOREIGN KEY(domain_id) REFERENCES domains(id)
-  ON DELETE CASCADE,
+  CONSTRAINT domain_exists FOREIGN KEY(domain_id) REFERENCES domains(id),
   CONSTRAINT c_lowercase_name CHECK (((name)::TEXT = LOWER((name)::TEXT)))
 );
 
 CREATE INDEX rec_name_index ON records(name);
 CREATE INDEX nametype_index ON records(name,type);
 CREATE INDEX domain_id ON records(domain_id);
-CREATE INDEX recordorder ON records (domain_id, ordername text_pattern_ops);
+CREATE INDEX recordorder ON records (domain_id, ordername);
 
 
 CREATE TABLE supermasters (
@@ -43,18 +41,16 @@ CREATE TABLE supermasters (
   PRIMARY KEY(ip, nameserver)
 );
 
-
+CREATE SEQUENCE comments_id_seq;
 CREATE TABLE comments (
-  id                    SERIAL PRIMARY KEY,
+  id                    SMALLINT PRIMARY KEY DEFAULT nextval('comments_id_seq'),
   domain_id             INT NOT NULL,
   name                  VARCHAR(255) NOT NULL,
   type                  VARCHAR(10) NOT NULL,
   modified_at           INT NOT NULL,
   account               VARCHAR(40) DEFAULT NULL,
   comment               VARCHAR(65535) NOT NULL,
-  CONSTRAINT domain_exists
-  FOREIGN KEY(domain_id) REFERENCES domains(id)
-  ON DELETE CASCADE,
+  CONSTRAINT domain_exists FOREIGN KEY(domain_id) REFERENCES domains(id),
   CONSTRAINT c_lowercase_name CHECK (((name)::TEXT = LOWER((name)::TEXT)))
 );
 
@@ -63,9 +59,10 @@ CREATE INDEX comments_name_type_idx ON comments (name, type);
 CREATE INDEX comments_order_idx ON comments (domain_id, modified_at);
 
 
+CREATE SEQUENCE domainmetadata_id_seq;
 CREATE TABLE domainmetadata (
-  id                    SERIAL PRIMARY KEY,
-  domain_id             INT REFERENCES domains(id) ON DELETE CASCADE,
+  id                    SMALLINT PRIMARY KEY DEFAULT nextval('domainmetadata_id_seq'),
+  domain_id             INT REFERENCES domains(id),
   kind                  VARCHAR(32),
   content               TEXT
 );
@@ -75,7 +72,7 @@ CREATE INDEX domainidmetaindex ON domainmetadata(domain_id);
 
 CREATE TABLE cryptokeys (
   id                    SERIAL PRIMARY KEY,
-  domain_id             INT REFERENCES domains(id) ON DELETE CASCADE,
+  domain_id             INT REFERENCES domains(id),
   flags                 INT NOT NULL,
   active                BOOL,
   content               TEXT
