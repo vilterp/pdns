@@ -1,6 +1,6 @@
 CREATE SEQUENCE domains_id_seq;
 CREATE TABLE domains (
-  id                    SMALLINT PRIMARY KEY DEFAULT nextval('domains_id_seq'),
+  id                    INT4 PRIMARY KEY DEFAULT nextval('domains_id_seq'),
   name                  VARCHAR(255) NOT NULL,
   master                VARCHAR(128) DEFAULT NULL,
   last_check            INT DEFAULT NULL,
@@ -43,7 +43,7 @@ CREATE TABLE supermasters (
 
 CREATE SEQUENCE comments_id_seq;
 CREATE TABLE comments (
-  id                    SMALLINT PRIMARY KEY DEFAULT nextval('comments_id_seq'),
+  id                    INT4 PRIMARY KEY DEFAULT nextval('comments_id_seq'),
   domain_id             INT NOT NULL,
   name                  VARCHAR(255) NOT NULL,
   type                  VARCHAR(10) NOT NULL,
@@ -61,7 +61,7 @@ CREATE INDEX comments_order_idx ON comments (domain_id, modified_at);
 
 CREATE SEQUENCE domainmetadata_id_seq;
 CREATE TABLE domainmetadata (
-  id                    SMALLINT PRIMARY KEY DEFAULT nextval('domainmetadata_id_seq'),
+  id                    INT4 PRIMARY KEY DEFAULT nextval('domainmetadata_id_seq'),
   domain_id             INT REFERENCES domains(id),
   kind                  VARCHAR(32),
   content               TEXT
